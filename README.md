@@ -1,6 +1,6 @@
 # 3D Floppy Disk SD Card Save
 
-Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Diskette, angelehnt an das Referenzfoto. Das Modell besteht aus zwei Teilen: einem Unterteil (Tray) mit Fächern für 2 SD- und 6 microSD-Karten und einem schlichten, unbeschrifteten Deckel, der über einen Klemmsteg aufgesteckt wird. Beide Teile sind auf minimale Wandstärke ausgelegt, bei der das Ganze noch stabil bleibt — geschlossen ist die Box nur ca. 7 mm dick.
+Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Diskette, angelehnt an das Referenzfoto. Das Modell besteht aus zwei Teilen: einem Unterteil (Tray) mit Fächern für 2 SD- und 6 microSD-Karten und einem schlichten, unbeschrifteten Deckel, der über einen Klemmsteg aufgesteckt wird. Beide Teile sind auf minimale Wandstärke ausgelegt, bei der das Ganze noch stabil bleibt — geschlossen ist die Box nur ca. 5,7 mm dick.
 
 ![Beide Teile, druckfertig](renders/preview_print_layout.png)
 ![Deckel-Vorderseite mit Etikettenfeld](renders/preview_front_label.png)
@@ -20,19 +20,20 @@ Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Di
 - Der Deckel wird von oben aufgesteckt: Ein umlaufender Steg an der Deckelunterseite klemmt sich in den Rand des Unterteils (Presspassung, kein Klebstoff/Scharnier nötig). Der Deckel ist bewusst schlicht gehalten, ohne Beschriftung oder Gravur.
 - Die Kontur ist an eine echte 3,5"-Diskette angelehnt: abgeschrägte Ecke oben links, plus die beiden Aussparungen an der Einschubkante (Schreibschutz-Schieber links, Sensorloch rechts). Die linke, größere Aussparung dient zugleich als Fingergriff, um den Deckel abzuheben. Diese Konturen sind reine Ausschnitte in der Grundfläche und machen die Box nicht dicker.
 - Auf dem Deckel (Vorderseite) ist ein flach vertieftes, leeres Etikettenfeld für einen eigenen Aufkleber vorgesehen — ohne Gravur/Schrift.
-- Auf der Unterseite des Unterteils (Rückseite) sind, wie bei einer echten Diskette, eine runde Nabe (mittig) und eine rechteckige "Alu-Abdeckung" mit Fenster nahe der Einschubkante angedeutet — beides rein dekorative, flache Vertiefungen (max. 0,6 mm).
-- Alle drei Deko-Elemente sind reine Vertiefungen und liegen auf der jeweiligen Außenfläche, weit genug von den Kartenfächern entfernt in der Bauteiltiefe (Boden bleibt überall mind. 1 mm stark) — die Box wird dadurch nicht dicker, an den Kartenfächern musste nichts verschoben werden.
-- Geschlossene Gesamthöhe ca. 7,1 mm, Wand-/Bodenstärke 1,6 mm — dünn, aber mit genug Materialstärke für einen stabilen Druck.
+- Auf der Unterseite des Unterteils (Rückseite) sind, wie bei einer echten Diskette, eine runde Nabe (mittig) und eine rechteckige "Alu-Abdeckung" mit Fenster nahe der Einschubkante angedeutet — beides rein dekorative, flache Vertiefungen (max. 0,45 mm).
+- Alle drei Deko-Elemente sind reine Vertiefungen und liegen auf der jeweiligen Außenfläche, weit genug von den Kartenfächern entfernt in der Bauteiltiefe (Boden bleibt überall mind. 0,75 mm stark) — die Box wird dadurch nicht dicker, an den Kartenfächern musste nichts verschoben werden.
+- Geschlossene Gesamthöhe ca. 5,7 mm, Wand-/Bodenstärke 1,2 mm — bewusst auf ein Minimum reduziert, bei dem der Druck noch stabil bleibt.
 
 ## Drucken
 
 Kein Support nötig — beide Teile liegen bereits druckfertig flach auf der Druckplatte.
 
 Empfohlene Einstellungen (PLA/PETG):
-- Schichthöhe: 0,16–0,2 mm
-- Wandlinien: 4 (bei 0,4 mm Düse ≈ 1,6 mm Wandstärke passend zum Modell)
-- Infill: 20–25 % (bei den dünnen Wänden sorgt das für ausreichend Stabilität)
+- Schichthöhe: 0,12–0,16 mm (bei den dünnen Wänden für sauberere Details empfehlenswert)
+- Wandlinien: 3 (bei 0,4 mm Düse ≈ 1,2 mm Wandstärke passend zum Modell)
+- Infill: 25–30 % (bei den dünnen Wänden sorgt das für ausreichend Stabilität)
 - Kein Support, kein Raft nötig (ggf. Brim für bessere Haftung der dünnen Aussenwände)
+- Material eher PETG als PLA, falls die Box etwas mehr aushalten soll — bei nur 1,2 mm Wandstärke etwas bruchempfindlicher als eine dickere Box
 
 Falls euer Druckbett kleiner als ca. 200 × 100 mm ist, druckt `floppy_sd_case_base.stl` und `floppy_sd_case_lid.stl` einzeln statt der `_both`-Datei.
 
@@ -41,7 +42,7 @@ Falls euer Druckbett kleiner als ca. 200 × 100 mm ist, druckt `floppy_sd_case_b
 In `model/floppy_sd_case.scad` anpassen und die STLs neu exportieren:
 
 - `fit_clearance` (Standard 0,25 mm) — Spiel zwischen Deckelsteg und Trayrand. Bei zu strammem Sitz erhöhen (z. B. 0,35–0,45 mm), je nach Drucker/Toleranz.
-- `wall` / `floor_t` / `lid_t` — Wandstärken; für noch mehr Stabilität erhöhen, für noch dünner reduzieren (nicht unter ca. 1,2 mm empfohlen).
+- `wall` / `floor_t` / `lid_t` — Wandstärken (Standard jetzt 1,2 mm); für mehr Stabilität erhöhen, für noch dünner reduzieren (nicht unter ca. 0,9–1,0 mm empfohlen, sonst wird der Druck sehr bruchempfindlich).
 - `protrusion` — wie weit die Karten oben aus den Fächern herausschauen (zum Greifen).
 - `sd_count`, `micro_cols` / `micro_rows` — Anzahl der Fächer.
 - `sd_w` / `sd_l` / `sd_t` und `micro_w` / `micro_l` / `micro_t` — Kartenmasse, falls andere Formate verstaut werden sollen.

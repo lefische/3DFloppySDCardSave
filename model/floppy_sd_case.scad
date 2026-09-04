@@ -30,10 +30,10 @@ sensor_notch_d  = 3.5;  // Tiefe Sensorloch-Aussparung
 sensor_notch_x  = outer_w / 2 - 13;   // Position von der Mitte aus
 
 /* [Wandstaerken - moeglichst duenn, aber stabil] */
-wall         = 1.6;   // Aussenwand des Trays
-floor_t      = 1.6;   // Bodenstaerke
-skirt_h      = 2.2;   // Hoehe des Rands, in den der Deckel greift
-lid_t        = 1.6;   // Deckelstaerke
+wall         = 1.2;   // Aussenwand des Trays
+floor_t      = 1.2;   // Bodenstaerke
+skirt_h      = 1.6;   // Hoehe des Rands, in den der Deckel greift
+lid_t        = 1.2;   // Deckelstaerke
 
 /* [SD-Kartenfaecher] */
 sd_w         = 24;    // SD-Karten-Breite
@@ -57,7 +57,7 @@ protrusion   = 0.4;   // wie weit die duennste Karte oben uebersteht (zum Greife
 
 /* [Passung Deckel] */
 fit_clearance = 0.25;  // Spiel zwischen Deckel-Steg und Trayrand
-skirt_wall    = 1.4;   // Wandstaerke des Deckelstegs
+skirt_wall    = 1.1;   // Wandstaerke des Deckelstegs
 skirt_len     = skirt_h - 0.4; // wie tief der Steg in den Tray eintaucht
 
 /* [Vorderseite - Etikettenflaeche] */
@@ -70,20 +70,20 @@ label_cy      = 8;     // Position, von der Mitte aus nach hinten versetzt
 /* [Rueckseite - Nabe und Alu-Abdeckung] */
 // Diese Details sitzen aussen auf dem Boden des Unterteils (= Rueckseite
 // der Diskette, wenn der Deckel oben/vorne die Etikettenseite ist).
-// Alles sind flache Vertiefungen (max. 0,7 mm) - die Box wird dadurch
-// nicht dicker, die Fachplatte bleibt ueberall min. 1 mm dick.
-hub_d          = 22;   // Aussendurchmesser der Naben-Vertiefung
-hub_hole_d     = 8;    // Innerer "Spindelloch"-Kreis
-hub_depth      = 0.3;  // Tiefe der aeusseren Naben-Vertiefung
-hub_hole_depth = 0.6;  // Tiefe (gesamt) des inneren Spindellochs
-hub_cy         = -6;   // Position der Nabenmitte, von der Mitte aus
+// Alles sind flache Vertiefungen (max. 0,45 mm) - die Box wird dadurch
+// nicht dicker, die Fachplatte bleibt ueberall min. 0,75 mm dick.
+hub_d          = 22;    // Aussendurchmesser der Naben-Vertiefung
+hub_hole_d     = 8;     // Innerer "Spindelloch"-Kreis
+hub_depth      = 0.2;   // Tiefe der aeusseren Naben-Vertiefung
+hub_hole_depth = 0.45;  // Tiefe (gesamt) des inneren Spindellochs
+hub_cy         = -6;    // Position der Nabenmitte, von der Mitte aus
 
-shutter_w        = 50;  // Breite der Alu-Abdeckung
+shutter_w        = 50;   // Breite der Alu-Abdeckung
 shutter_d         = 15;  // Tiefe der Alu-Abdeckung (ab Einschubkante)
-shutter_depth     = 0.3;  // Tiefe der Abdeckungs-Vertiefung
-shutter_window_w  = 30;   // Breite des inneren "Fensters"
-shutter_window_d  = 7;    // Tiefe des inneren "Fensters"
-shutter_window_depth = 0.6; // Tiefe (gesamt) des inneren Fensters
+shutter_depth     = 0.2;   // Tiefe der Abdeckungs-Vertiefung
+shutter_window_w  = 30;    // Breite des inneren "Fensters"
+shutter_window_d  = 7;     // Tiefe des inneren "Fensters"
+shutter_window_depth = 0.45; // Tiefe (gesamt) des inneren Fensters
 
 // ---------------------------------------------------------------------
 // Abgeleitete Werte
