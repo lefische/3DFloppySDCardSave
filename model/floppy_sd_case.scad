@@ -1,6 +1,8 @@
 // Floppy Disk SD Card Case
 // 3.5"-Diskette als duenne, stabile Aufbewahrungsbox fuer 2 SD- und
-// 4 microSD-Karten (2 Teile: Tray + schlichter Deckel, ohne Beschriftung).
+// 6 microSD-Karten (2 Teile: Tray + schlichter Deckel, ohne Beschriftung).
+// Die Kontur ist an eine echte 3,5"-Diskette angelehnt (abgeschraegte
+// Ecke, Schreibschutz- und Sensor-Aussparung an der Einschubkante).
 // Rendern in OpenSCAD, "part" unten waehlen, dann als STL exportieren.
 
 $fn = 64;
@@ -15,11 +17,23 @@ outer_d   = 94;   // Tiefe (Y)
 corner_r  = 3;    // Eckenradius
 notch     = 14;   // Groesse der abgeschraegten Diskettenecke (oben links)
 
+// Echte 3,5"-Disketten haben an der Einschubkante (unten) zwei kleine
+// Aussparungen: den Schreibschutz-Schieber (links, hier zugleich als
+// Fingergriff zum Oeffnen genutzt) und das kleinere Sensorloch (rechts,
+// rein dekorativ). Beide sind Teil der Kontur, nicht der Bauteiltiefe -
+// die Box wird dadurch nicht dicker.
+wp_notch_w      = 9;    // Breite Schreibschutz-Aussparung
+wp_notch_d      = 6;    // Tiefe Schreibschutz-Aussparung
+wp_notch_x      = -outer_w / 2 + 13;  // Position von der Mitte aus
+sensor_notch_w  = 5;    // Breite Sensorloch-Aussparung
+sensor_notch_d  = 3.5;  // Tiefe Sensorloch-Aussparung
+sensor_notch_x  = outer_w / 2 - 13;   // Position von der Mitte aus
+
 /* [Wandstaerken - moeglichst duenn, aber stabil] */
-wall         = 1.6;   // Aussenwand des Trays
-floor_t      = 1.6;   // Bodenstaerke
-skirt_h      = 2.2;   // Hoehe des Rands, in den der Deckel greift
-lid_t        = 1.6;   // Deckelstaerke
+wall         = 1.2;   // Aussenwand des Trays
+floor_t      = 1.2;   // Bodenstaerke
+skirt_h      = 1.6;   // Hoehe des Rands, in den der Deckel greift
+lid_t        = 1.2;   // Deckelstaerke
 
 /* [SD-Kartenfaecher] */
 sd_w         = 24;    // SD-Karten-Breite
@@ -43,8 +57,33 @@ protrusion   = 0.4;   // wie weit die duennste Karte oben uebersteht (zum Greife
 
 /* [Passung Deckel] */
 fit_clearance = 0.25;  // Spiel zwischen Deckel-Steg und Trayrand
-skirt_wall    = 1.4;   // Wandstaerke des Deckelstegs
+skirt_wall    = 1.1;   // Wandstaerke des Deckelstegs
 skirt_len     = skirt_h - 0.4; // wie tief der Steg in den Tray eintaucht
+
+/* [Vorderseite - Etikettenflaeche] */
+// Nur eine flache Vertiefung fuer einen Aufkleber, keine Gravur/Schrift.
+label_w       = outer_w * 0.62;
+label_d       = outer_d * 0.32;
+label_depth   = 0.4;   // Vertiefungstiefe
+label_cy      = 8;     // Position, von der Mitte aus nach hinten versetzt
+
+/* [Rueckseite - Nabe und Alu-Abdeckung] */
+// Diese Details sitzen aussen auf dem Boden des Unterteils (= Rueckseite
+// der Diskette, wenn der Deckel oben/vorne die Etikettenseite ist).
+// Alles sind flache Vertiefungen (max. 0,45 mm) - die Box wird dadurch
+// nicht dicker, die Fachplatte bleibt ueberall min. 0,75 mm dick.
+hub_d          = 22;    // Aussendurchmesser der Naben-Vertiefung
+hub_hole_d     = 8;     // Innerer "Spindelloch"-Kreis
+hub_depth      = 0.2;   // Tiefe der aeusseren Naben-Vertiefung
+hub_hole_depth = 0.45;  // Tiefe (gesamt) des inneren Spindellochs
+hub_cy         = -6;    // Position der Nabenmitte, von der Mitte aus
+
+shutter_w        = 50;   // Breite der Alu-Abdeckung
+shutter_d         = 15;  // Tiefe der Alu-Abdeckung (ab Einschubkante)
+shutter_depth     = 0.2;   // Tiefe der Abdeckungs-Vertiefung
+shutter_window_w  = 30;    // Breite des inneren "Fensters"
+shutter_window_d  = 7;     // Tiefe des inneren "Fensters"
+shutter_window_depth = 0.45; // Tiefe (gesamt) des inneren Fensters
 
 // ---------------------------------------------------------------------
 // Abgeleitete Werte
@@ -68,13 +107,23 @@ content_d = sd_group_d + group_gap + micro_group_d;
 sd_group_cy    = content_d / 2 - sd_group_d / 2;
 micro_group_cy = sd_group_cy - sd_group_d / 2 - group_gap - micro_group_d / 2;
 
+// Randaussparung: von aussen in die Kontur geschnittene, abgerundete
+// Nut (fuer Schreibschutz-Schieber / Sensorloch an der Einschubkante).
+module edge_notch(cx, w, d, r = 1.2) {
+    translate([cx, -outer_d / 2 - 1 + (d + 1) / 2])
+        offset(r = r) offset(delta = -r) square([w, d + 1], center = true);
+}
+
 // 2D-Grundriss der Diskette: abgerundetes Rechteck mit einer
-// abgeschraegten Ecke oben links (Schreibschutz-/Orientierungsecke).
+// abgeschraegten Ecke oben links (Schreibschutz-/Orientierungsecke)
+// sowie den beiden Aussparungen an der unteren Einschubkante.
 module floppy_shape(w = outer_w, d = outer_d, r = corner_r, n = notch) {
     difference() {
         offset(r = r) offset(delta = -r) square([w, d], center = true);
         translate([-w / 2, d / 2])
             polygon([[0, 0], [n, 0], [0, -n]]);
+        edge_notch(wp_notch_x, wp_notch_w, wp_notch_d, 2.5);
+        edge_notch(sensor_notch_x, sensor_notch_w, sensor_notch_d, 1);
     }
 }
 
@@ -95,19 +144,44 @@ module pocket_block(cols, rows, pw, pd, cy) {
         }
 }
 
+// Flache, unbeschriftete Vertiefung fuer einen Aufkleber (Vorderseite/Deckel).
+module label_area() {
+    translate([0, label_cy])
+        offset(r = 2) offset(delta = -2)
+            square([label_w, label_d], center = true);
+}
+
+// Rueckseiten-Nabe: aussen konzentrischer Kreis, mit tieferem Punkt in der Mitte
+// (deutet die Metallnabe/Spindelaufnahme einer echten Diskette an).
+module hub_decor() {
+    translate([0, hub_cy]) {
+        circle(d = hub_d);
+    }
+}
+module hub_decor_deep() {
+    translate([0, hub_cy]) circle(d = hub_hole_d);
+}
+
+// Rueckseiten-"Alu-Abdeckung": rechteckige Vertiefung an der Einschubkante
+// mit einem etwas tieferen inneren Fenster, angelehnt an den Metallschieber
+// einer echten Diskette. Rein dekorativ (kein bewegliches Teil).
+module shutter_decor() {
+    translate([0, -outer_d / 2 + shutter_d / 2])
+        offset(r = 1.5) offset(delta = -1.5)
+            square([shutter_w, shutter_d], center = true);
+}
+module shutter_decor_deep() {
+    translate([0, -outer_d / 2 + shutter_d / 2])
+        offset(r = 1) offset(delta = -1)
+            square([shutter_window_w, shutter_window_d], center = true);
+}
+
 module sd_pockets() {
     pocket_block(sd_count, 1, pocket_sd_w, pocket_sd_d, sd_group_cy);
 }
 
 module micro_pockets() {
     pocket_block(micro_cols, micro_rows, pocket_micro_w, pocket_micro_d, micro_group_cy);
-}
-
-// Kleine Kerbe an der Vorderkante, um den Deckel mit dem Fingernagel
-// abheben zu koennen.
-module finger_notch(depth_extra = 0) {
-    translate([0, -outer_d / 2, -0.1])
-        cylinder(h = base_h + 0.2 + depth_extra, r = 5);
 }
 
 module base_tray() {
@@ -135,7 +209,17 @@ module base_tray() {
         translate([0, 0, floor_t + plate_h - pocket_micro_depth])
             linear_extrude(height = pocket_micro_depth + 0.1)
                 micro_pockets();
-        finger_notch();
+        // Rueckseiten-Deko (Boden aussen): Nabe + Alu-Abdeckung, jeweils flach
+        // vertieft. Weit genug von den Taschen entfernt in Z (Bodenstaerke
+        // bleibt an jeder Stelle mind. 1 mm), macht die Box nicht dicker.
+        translate([0, 0, -0.05])
+            linear_extrude(height = hub_depth + 0.05) hub_decor();
+        translate([0, 0, -0.05])
+            linear_extrude(height = hub_hole_depth + 0.05) hub_decor_deep();
+        translate([0, 0, -0.05])
+            linear_extrude(height = shutter_depth + 0.05) shutter_decor();
+        translate([0, 0, -0.05])
+            linear_extrude(height = shutter_window_depth + 0.05) shutter_decor_deep();
     }
 }
 
@@ -152,8 +236,9 @@ module lid() {
                         offset(delta = -wall - fit_clearance - skirt_wall) floppy_shape();
                     }
         }
-        // Kerbe passend zum Tray
-        finger_notch(1);
+        // Etikettenflaeche: flache, unbeschriftete Vertiefung fuer einen Aufkleber
+        translate([0, 0, lid_t - label_depth])
+            linear_extrude(height = label_depth + 0.1) label_area();
     }
 }
 
