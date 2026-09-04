@@ -1,5 +1,6 @@
 // Floppy Disk SD Card Case
-// 3.5"-Diskette als Aufbewahrungsbox fuer SD-Karten (2 Teile: Tray + Deckel).
+// 3.5"-Diskette als duenne, stabile Aufbewahrungsbox fuer 2 SD- und
+// 4 microSD-Karten (2 Teile: Tray + schlichter Deckel, ohne Beschriftung).
 // Rendern in OpenSCAD, "part" unten waehlen, dann als STL exportieren.
 
 $fn = 64;
@@ -14,35 +15,58 @@ outer_d   = 94;   // Tiefe (Y)
 corner_r  = 3;    // Eckenradius
 notch     = 14;   // Groesse der abgeschraegten Diskettenecke (oben links)
 
-/* [Wandstaerken] */
-wall        = 2.2;   // Aussenwand des Trays
-floor_t     = 2;     // Bodenstaerke
-pocket_depth = 3.5;  // Tiefe der Kartenfaecher
-skirt_h     = 4;     // Hoehe des Rands, in den der Deckel greift
-lid_t       = 2.2;   // Deckelstaerke
+/* [Wandstaerken - moeglichst duenn, aber stabil] */
+wall         = 1.6;   // Aussenwand des Trays
+floor_t      = 1.6;   // Bodenstaerke
+skirt_h      = 2.2;   // Hoehe des Rands, in den der Deckel greift
+lid_t        = 1.6;   // Deckelstaerke
 
-/* [Kartenfaecher] */
-card_w    = 24;    // SD-Karten-Breite
-card_l    = 32;    // SD-Karten-Laenge
-clearance = 1.2;   // Spiel pro Fach
-divider   = 2.2;   // Stegbreite zwischen den Faechern
-cols      = 2;      // Spalten
-rows      = 3;      // Reihen
+/* [SD-Kartenfaecher] */
+sd_w         = 24;    // SD-Karten-Breite
+sd_l         = 32;    // SD-Karten-Laenge
+sd_t         = 2.1;   // SD-Karten-Dicke
+sd_clearance = 1.0;   // Spiel pro Fach (XY)
+sd_count     = 2;     // Anzahl SD-Faecher (nebeneinander)
+
+/* [microSD-Kartenfaecher] */
+micro_w         = 11;    // microSD-Breite
+micro_l         = 15;    // microSD-Laenge
+micro_t         = 1.0;   // microSD-Dicke
+micro_clearance = 1.2;   // Spiel pro Fach (XY)
+micro_cols      = 2;     // Spalten
+micro_rows      = 2;     // Reihen (macht 4 Faecher)
+
+/* [Faecher allgemein] */
+divider      = 1.6;   // Stegbreite zwischen den Faechern
+group_gap    = 6;     // Abstand zwischen SD-Reihe und microSD-Raster
+protrusion   = 0.4;   // wie weit die duennste Karte oben uebersteht (zum Greifen)
 
 /* [Passung Deckel] */
-fit_clearance = 0.3;  // Spiel zwischen Deckel-Steg und Trayrand
-skirt_wall    = 1.6;  // Wandstaerke des Deckelstegs
-skirt_len     = skirt_h - 0.6; // wie tief der Steg in den Tray eintaucht
-
-/* [Beschriftung] */
-label_text = "SD BACKUP";
-label_size = 8;
+fit_clearance = 0.25;  // Spiel zwischen Deckel-Steg und Trayrand
+skirt_wall    = 1.4;   // Wandstaerke des Deckelstegs
+skirt_len     = skirt_h - 0.4; // wie tief der Steg in den Tray eintaucht
 
 // ---------------------------------------------------------------------
 // Abgeleitete Werte
-base_h = floor_t + pocket_depth + skirt_h;
-pocket_w = card_l + clearance;
-pocket_d = card_w + clearance;
+pocket_sd_w = sd_l + sd_clearance;
+pocket_sd_d = sd_w + sd_clearance;
+// Taschentiefe = Kartendicke minus gewuenschtem Ueberstand (nicht duenner als 0.6mm Restboden)
+pocket_sd_depth    = max(sd_t - protrusion, 0.6);
+pocket_micro_depth = max(micro_t - protrusion, 0.5);
+plate_h  = max(pocket_sd_depth, pocket_micro_depth); // Dicke der Fachplatte ab dem Boden
+base_h   = floor_t + plate_h + skirt_h;
+
+pocket_micro_w = micro_l + micro_clearance;
+pocket_micro_d = micro_w + micro_clearance;
+
+sd_group_w    = sd_count * pocket_sd_w + (sd_count + 1) * divider;
+sd_group_d    = pocket_sd_d + 2 * divider;
+micro_group_w = micro_cols * pocket_micro_w + (micro_cols + 1) * divider;
+micro_group_d = micro_rows * pocket_micro_d + (micro_rows + 1) * divider;
+
+content_d = sd_group_d + group_gap + micro_group_d;
+sd_group_cy    = content_d / 2 - sd_group_d / 2;
+micro_group_cy = sd_group_cy - sd_group_d / 2 - group_gap - micro_group_d / 2;
 
 // 2D-Grundriss der Diskette: abgerundetes Rechteck mit einer
 // abgeschraegten Ecke oben links (Schreibschutz-/Orientierungsecke).
@@ -55,27 +79,35 @@ module floppy_shape(w = outer_w, d = outer_d, r = corner_r, n = notch) {
 }
 
 // Rechteckiges Fach mit leicht abgerundeten Ecken (leichteres Einlegen).
-module pocket(w, d, r = 1.5) {
+module pocket(w, d, r = 1.2) {
     offset(r = r) offset(delta = -r) square([w, d], center = true);
 }
 
-// Fach-Raster, zentriert im Innenraum des Trays.
-module pocket_grid() {
-    grid_w = cols * pocket_w + (cols + 1) * divider;
-    grid_d = rows * pocket_d + (rows + 1) * divider;
+// Ein Block aus cols x rows gleich grossen Faechern, zentriert um (0, cy).
+module pocket_block(cols, rows, pw, pd, cy) {
+    grid_w = cols * pw + (cols + 1) * divider;
+    grid_d = rows * pd + (rows + 1) * divider;
     for (c = [0 : cols - 1])
         for (r = [0 : rows - 1]) {
-            x = -grid_w / 2 + divider + pocket_w / 2 + c * (pocket_w + divider);
-            y = -grid_d / 2 + divider + pocket_d / 2 + r * (pocket_d + divider);
-            translate([x, y]) pocket(pocket_w, pocket_d);
+            x = -grid_w / 2 + divider + pw / 2 + c * (pw + divider);
+            y = cy - grid_d / 2 + divider + pd / 2 + r * (pd + divider);
+            translate([x, y]) pocket(pw, pd);
         }
+}
+
+module sd_pockets() {
+    pocket_block(sd_count, 1, pocket_sd_w, pocket_sd_d, sd_group_cy);
+}
+
+module micro_pockets() {
+    pocket_block(micro_cols, micro_rows, pocket_micro_w, pocket_micro_d, micro_group_cy);
 }
 
 // Kleine Kerbe an der Vorderkante, um den Deckel mit dem Fingernagel
 // abheben zu koennen.
 module finger_notch(depth_extra = 0) {
     translate([0, -outer_d / 2, -0.1])
-        cylinder(h = base_h + 0.2 + depth_extra, r = 6);
+        cylinder(h = base_h + 0.2 + depth_extra, r = 5);
 }
 
 module base_tray() {
@@ -90,53 +122,38 @@ module base_tray() {
             // Boden
             linear_extrude(height = floor_t)
                 floppy_shape();
-            // Fachplatte mit Ausschnitten
+            // Fachplatte, zunaechst massiv (Taschen werden unten abgezogen)
             translate([0, 0, floor_t])
-                linear_extrude(height = pocket_depth)
-                    difference() {
-                        offset(delta = -wall) floppy_shape();
-                        pocket_grid();
-                    }
+                linear_extrude(height = plate_h)
+                    offset(delta = -wall) floppy_shape();
         }
+        // SD-Taschen: volle Plattentiefe (bis auf den Boden)
+        translate([0, 0, floor_t + plate_h - pocket_sd_depth])
+            linear_extrude(height = pocket_sd_depth + 0.1)
+                sd_pockets();
+        // microSD-Taschen: flacher, duennere Karten liegen naeher an der Oberflaeche
+        translate([0, 0, floor_t + plate_h - pocket_micro_depth])
+            linear_extrude(height = pocket_micro_depth + 0.1)
+                micro_pockets();
         finger_notch();
     }
 }
 
-label_recess_depth = 0.5;  // Tiefe der Etikettenvertiefung
-label_text_h       = 0.4;  // wie weit die Schrift darin hervorsteht (< label_recess_depth)
-
 module lid() {
-    union() {
-        difference() {
-            union() {
-                // Deckplatte
-                linear_extrude(height = lid_t) floppy_shape();
-                // Steg, der in den Tray-Rand fasst
-                translate([0, 0, -skirt_len])
-                    linear_extrude(height = skirt_len)
-                        difference() {
-                            offset(delta = -wall - fit_clearance) floppy_shape();
-                            offset(delta = -wall - fit_clearance - skirt_wall) floppy_shape();
-                        }
-            }
-            // dekorativer "Schutzschieber" oben (angelehnt an das Diskettenvorbild)
-            translate([outer_w / 4, outer_d / 4 - 4, lid_t - 0.6])
-                linear_extrude(height = 0.8)
-                    offset(r = 1.5) offset(delta = -1.5)
-                        square([outer_w * 0.34, outer_d * 0.22], center = true);
-            // Etiketten-Vertiefung
-            translate([0, -outer_d * 0.08, lid_t - label_recess_depth])
-                linear_extrude(height = label_recess_depth + 0.1)
-                    offset(r = 2) offset(delta = -2)
-                        square([outer_w * 0.68, outer_d * 0.34], center = true);
-            // Kerbe passend zum Tray
-            finger_notch(1);
+    difference() {
+        union() {
+            // Deckplatte (schlicht, ohne Beschriftung)
+            linear_extrude(height = lid_t) floppy_shape();
+            // Steg, der in den Tray-Rand fasst
+            translate([0, 0, -skirt_len])
+                linear_extrude(height = skirt_len)
+                    difference() {
+                        offset(delta = -wall - fit_clearance) floppy_shape();
+                        offset(delta = -wall - fit_clearance - skirt_wall) floppy_shape();
+                    }
         }
-        // Beschriftung: erhaben im Boden der Etikettenvertiefung
-        if (label_text != "")
-            translate([0, -outer_d * 0.08, lid_t - label_recess_depth])
-                linear_extrude(height = label_text_h)
-                    text(label_text, size = label_size, halign = "center", valign = "center", font = "Liberation Sans:style=Bold");
+        // Kerbe passend zum Tray
+        finger_notch(1);
     }
 }
 
