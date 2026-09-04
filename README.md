@@ -1,6 +1,6 @@
 # 3D Floppy Disk SD Card Save
 
-Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Diskette, angelehnt an das Referenzfoto. Das Modell besteht aus zwei Teilen: einem Unterteil (Tray) mit Fächern für 2 SD- und 4 microSD-Karten und einem schlichten, unbeschrifteten Deckel, der über einen Klemmsteg aufgesteckt wird. Beide Teile sind auf minimale Wandstärke ausgelegt, bei der das Ganze noch stabil bleibt — geschlossen ist die Box nur ca. 7 mm dick.
+Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Diskette, angelehnt an das Referenzfoto. Das Modell besteht aus zwei Teilen: einem Unterteil (Tray) mit Fächern für 2 SD- und 6 microSD-Karten und einem schlichten, unbeschrifteten Deckel, der über einen Klemmsteg aufgesteckt wird. Beide Teile sind auf minimale Wandstärke ausgelegt, bei der das Ganze noch stabil bleibt — geschlossen ist die Box nur ca. 7 mm dick.
 
 ![Beide Teile, druckfertig](renders/preview_print_layout.png)
 
@@ -13,7 +13,7 @@ Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Di
 
 ## Funktionsweise
 
-- Das Unterteil hat 2 Fächer für volle SD-Karten (32 × 24 mm) nebeneinander sowie 4 kleinere Fächer für microSD-Karten (15 × 11 mm) im 2×2-Raster darunter — insgesamt 6 Karten.
+- Das Unterteil hat 2 Fächer für volle SD-Karten (32 × 24 mm) nebeneinander sowie 6 kleinere Fächer für microSD-Karten (15 × 11 mm) im 3×2-Raster darunter — insgesamt 8 Karten.
 - Die microSD-Fächer sind flacher als die SD-Fächer (an die geringere Kartendicke angepasst), damit trotzdem alle Karten sicher sitzen und zum Herausnehmen leicht überstehen.
 - Der Deckel wird von oben aufgesteckt: Ein umlaufender Steg an der Deckelunterseite klemmt sich in den Rand des Unterteils (Presspassung, kein Klebstoff/Scharnier nötig). Der Deckel ist bewusst schlicht gehalten, ohne Beschriftung oder Gravur.
 - An der Vorderkante ist bei beiden Teilen eine kleine Kerbe eingearbeitet, um den Deckel bequem mit dem Fingernagel abheben zu können.

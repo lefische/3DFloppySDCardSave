@@ -33,8 +33,8 @@ micro_w         = 11;    // microSD-Breite
 micro_l         = 15;    // microSD-Laenge
 micro_t         = 1.0;   // microSD-Dicke
 micro_clearance = 1.2;   // Spiel pro Fach (XY)
-micro_cols      = 2;     // Spalten
-micro_rows      = 2;     // Reihen (macht 4 Faecher)
+micro_cols      = 3;     // Spalten
+micro_rows      = 2;     // Reihen (macht 6 Faecher)
 
 /* [Faecher allgemein] */
 divider      = 1.6;   // Stegbreite zwischen den Faechern
