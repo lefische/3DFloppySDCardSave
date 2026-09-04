@@ -60,6 +60,31 @@ fit_clearance = 0.25;  // Spiel zwischen Deckel-Steg und Trayrand
 skirt_wall    = 1.4;   // Wandstaerke des Deckelstegs
 skirt_len     = skirt_h - 0.4; // wie tief der Steg in den Tray eintaucht
 
+/* [Vorderseite - Etikettenflaeche] */
+// Nur eine flache Vertiefung fuer einen Aufkleber, keine Gravur/Schrift.
+label_w       = outer_w * 0.62;
+label_d       = outer_d * 0.32;
+label_depth   = 0.4;   // Vertiefungstiefe
+label_cy      = 8;     // Position, von der Mitte aus nach hinten versetzt
+
+/* [Rueckseite - Nabe und Alu-Abdeckung] */
+// Diese Details sitzen aussen auf dem Boden des Unterteils (= Rueckseite
+// der Diskette, wenn der Deckel oben/vorne die Etikettenseite ist).
+// Alles sind flache Vertiefungen (max. 0,7 mm) - die Box wird dadurch
+// nicht dicker, die Fachplatte bleibt ueberall min. 1 mm dick.
+hub_d          = 22;   // Aussendurchmesser der Naben-Vertiefung
+hub_hole_d     = 8;    // Innerer "Spindelloch"-Kreis
+hub_depth      = 0.3;  // Tiefe der aeusseren Naben-Vertiefung
+hub_hole_depth = 0.6;  // Tiefe (gesamt) des inneren Spindellochs
+hub_cy         = -6;   // Position der Nabenmitte, von der Mitte aus
+
+shutter_w        = 50;  // Breite der Alu-Abdeckung
+shutter_d         = 15;  // Tiefe der Alu-Abdeckung (ab Einschubkante)
+shutter_depth     = 0.3;  // Tiefe der Abdeckungs-Vertiefung
+shutter_window_w  = 30;   // Breite des inneren "Fensters"
+shutter_window_d  = 7;    // Tiefe des inneren "Fensters"
+shutter_window_depth = 0.6; // Tiefe (gesamt) des inneren Fensters
+
 // ---------------------------------------------------------------------
 // Abgeleitete Werte
 pocket_sd_w = sd_l + sd_clearance;
@@ -119,6 +144,38 @@ module pocket_block(cols, rows, pw, pd, cy) {
         }
 }
 
+// Flache, unbeschriftete Vertiefung fuer einen Aufkleber (Vorderseite/Deckel).
+module label_area() {
+    translate([0, label_cy])
+        offset(r = 2) offset(delta = -2)
+            square([label_w, label_d], center = true);
+}
+
+// Rueckseiten-Nabe: aussen konzentrischer Kreis, mit tieferem Punkt in der Mitte
+// (deutet die Metallnabe/Spindelaufnahme einer echten Diskette an).
+module hub_decor() {
+    translate([0, hub_cy]) {
+        circle(d = hub_d);
+    }
+}
+module hub_decor_deep() {
+    translate([0, hub_cy]) circle(d = hub_hole_d);
+}
+
+// Rueckseiten-"Alu-Abdeckung": rechteckige Vertiefung an der Einschubkante
+// mit einem etwas tieferen inneren Fenster, angelehnt an den Metallschieber
+// einer echten Diskette. Rein dekorativ (kein bewegliches Teil).
+module shutter_decor() {
+    translate([0, -outer_d / 2 + shutter_d / 2])
+        offset(r = 1.5) offset(delta = -1.5)
+            square([shutter_w, shutter_d], center = true);
+}
+module shutter_decor_deep() {
+    translate([0, -outer_d / 2 + shutter_d / 2])
+        offset(r = 1) offset(delta = -1)
+            square([shutter_window_w, shutter_window_d], center = true);
+}
+
 module sd_pockets() {
     pocket_block(sd_count, 1, pocket_sd_w, pocket_sd_d, sd_group_cy);
 }
@@ -152,20 +209,36 @@ module base_tray() {
         translate([0, 0, floor_t + plate_h - pocket_micro_depth])
             linear_extrude(height = pocket_micro_depth + 0.1)
                 micro_pockets();
+        // Rueckseiten-Deko (Boden aussen): Nabe + Alu-Abdeckung, jeweils flach
+        // vertieft. Weit genug von den Taschen entfernt in Z (Bodenstaerke
+        // bleibt an jeder Stelle mind. 1 mm), macht die Box nicht dicker.
+        translate([0, 0, -0.05])
+            linear_extrude(height = hub_depth + 0.05) hub_decor();
+        translate([0, 0, -0.05])
+            linear_extrude(height = hub_hole_depth + 0.05) hub_decor_deep();
+        translate([0, 0, -0.05])
+            linear_extrude(height = shutter_depth + 0.05) shutter_decor();
+        translate([0, 0, -0.05])
+            linear_extrude(height = shutter_window_depth + 0.05) shutter_decor_deep();
     }
 }
 
 module lid() {
-    union() {
-        // Deckplatte (schlicht, ohne Beschriftung)
-        linear_extrude(height = lid_t) floppy_shape();
-        // Steg, der in den Tray-Rand fasst
-        translate([0, 0, -skirt_len])
-            linear_extrude(height = skirt_len)
-                difference() {
-                    offset(delta = -wall - fit_clearance) floppy_shape();
-                    offset(delta = -wall - fit_clearance - skirt_wall) floppy_shape();
-                }
+    difference() {
+        union() {
+            // Deckplatte (schlicht, ohne Beschriftung)
+            linear_extrude(height = lid_t) floppy_shape();
+            // Steg, der in den Tray-Rand fasst
+            translate([0, 0, -skirt_len])
+                linear_extrude(height = skirt_len)
+                    difference() {
+                        offset(delta = -wall - fit_clearance) floppy_shape();
+                        offset(delta = -wall - fit_clearance - skirt_wall) floppy_shape();
+                    }
+        }
+        // Etikettenflaeche: flache, unbeschriftete Vertiefung fuer einen Aufkleber
+        translate([0, 0, lid_t - label_depth])
+            linear_extrude(height = label_depth + 0.1) label_area();
     }
 }
 
