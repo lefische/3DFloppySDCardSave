@@ -16,7 +16,7 @@ Ein 3D-druckbares SD-Karten-Aufbewahrungsbox im Design einer klassischen 3,5"-Di
 - Das Unterteil hat 2 Fächer für volle SD-Karten (32 × 24 mm) nebeneinander sowie 6 kleinere Fächer für microSD-Karten (15 × 11 mm) im 3×2-Raster darunter — insgesamt 8 Karten.
 - Die microSD-Fächer sind flacher als die SD-Fächer (an die geringere Kartendicke angepasst), damit trotzdem alle Karten sicher sitzen und zum Herausnehmen leicht überstehen.
 - Der Deckel wird von oben aufgesteckt: Ein umlaufender Steg an der Deckelunterseite klemmt sich in den Rand des Unterteils (Presspassung, kein Klebstoff/Scharnier nötig). Der Deckel ist bewusst schlicht gehalten, ohne Beschriftung oder Gravur.
-- An der Vorderkante ist bei beiden Teilen eine kleine Kerbe eingearbeitet, um den Deckel bequem mit dem Fingernagel abheben zu können.
+- Die Kontur ist an eine echte 3,5"-Diskette angelehnt: abgeschrägte Ecke oben links, plus die beiden Aussparungen an der Einschubkante (Schreibschutz-Schieber links, Sensorloch rechts). Die linke, größere Aussparung dient zugleich als Fingergriff, um den Deckel abzuheben. Diese Konturen sind reine Ausschnitte in der Grundfläche und machen die Box nicht dicker.
 - Geschlossene Gesamthöhe ca. 7,1 mm, Wand-/Bodenstärke 1,6 mm — dünn, aber mit genug Materialstärke für einen stabilen Druck.
 
 ## Drucken
@@ -40,6 +40,7 @@ In `model/floppy_sd_case.scad` anpassen und die STLs neu exportieren:
 - `protrusion` — wie weit die Karten oben aus den Fächern herausschauen (zum Greifen).
 - `sd_count`, `micro_cols` / `micro_rows` — Anzahl der Fächer.
 - `sd_w` / `sd_l` / `sd_t` und `micro_w` / `micro_l` / `micro_t` — Kartenmasse, falls andere Formate verstaut werden sollen.
+- `wp_notch_w/d/x` / `sensor_notch_w/d/x` — Größe und Position der Disketten-Kontur-Aussparungen an der Einschubkante.
 
 Neu exportieren mit OpenSCAD (CLI-Beispiel):
 
